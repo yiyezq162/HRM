@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>部门列表</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <!-- meta使用viewport以确保页面可自由缩放 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- 引入 jQuery Mobile 样式 -->
+    <link rel="stylesheet" href="http://apps.bdimg.com/libs/jquerymobile/1.4.5/jquery.mobile-1.4.5.min.css">
+
+    <!-- 引入 jQuery 库 -->
+    <script src="http://apps.bdimg.com/libs/jquery/1.10.2/jquery.min.js"></script>
+
+    <!-- 引入 jQuery Mobile 库 -->
+    <script src="http://apps.bdimg.com/libs/jquerymobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+</head>
+<body>
+<div data-role="page" id="pageone">
+    <div data-role="header">
+        <a href="login.html" data-icon="back" rel="external">退出登录</a>
+        <h1>公司部门</h1>
+        <a href="worker/staffSearch.html" data-icon="search" rel="external">查找员工</a>
+    </div>
+    <div data-role="main" class="ui-content">
+        <ul data-role="listview" data-inset="true" id="plan-list">
+
+        </ul>
+    </div>
+    <div data-role="footer" data-position="fixed">
+        <a href="worker/staffAdd.html" data-icon="plus" rel="external">添加员工</a>
+        <a href="worker/check.html" data-icon="check" rel="external">打卡设置</a>
+        <a href="#" onclick="alert('研发中')" data-icon="home" rel="external">高级功能</a>
+    </div>
+</div>
+</body>
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            url: '/department',
+            type: 'get',
+            success: function (res) {
+                var daras = res.data;
+                var tbhtml = "";
+                for (var i = 0; i < daras.length; i++) {
+                    var depName = daras[i].depName;
+                    var depId = daras[i].depId;
+                    tbhtml += "<li><a href=\"/staff/dep/" + depId + "\" onclick=\"sendBtn(this);return false;\" >" + depName + "</a></li>";
+
+                }
+                $('ul:eq(0)').html(tbhtml);
+                $('#plan-list').listview('refresh');
+            }
+        })
+    })
+
+    function sendBtn(node) {
+        var url = node.href;/*得到href的值*/
+        $.ajax({
+            url: url,/*url也可以是json之类的文件等等*/
+            type: 'Get',
+            success: function (res) {
+                //判断result结果
+                if (res.code === 1) {
+                    window.localStorage.setItem("sfDep", res.data[0].sfDep)
+                    window.location.href = 'worker/staffList.html';
+                } else {
+                    alert("未知错误")
+                }
+            },
+            error: function (res) {
+              alert("服务器未响应")
+            }
+        })
+    }
+</script>
+</html>

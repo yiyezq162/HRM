@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>查找员工</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <!-- meta使用viewport以确保页面可自由缩放 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- 引入 jQuery Mobile 样式 -->
+    <link rel="stylesheet" href="http://apps.bdimg.com/libs/jquerymobile/1.4.5/jquery.mobile-1.4.5.min.css">
+
+    <!-- 引入 jQuery 库 -->
+    <script src="http://apps.bdimg.com/libs/jquery/1.10.2/jquery.min.js"></script>
+
+    <!-- 引入 jQuery Mobile 库 -->
+    <script src="http://apps.bdimg.com/libs/jquerymobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+</head>
+<body>
+<div data-role="page">
+    <div data-role="header">
+        <a href="../department.html" data-icon="back" rel="external">返回</a>
+        <h1>查找员工</h1>
+    </div>
+    <div data-role="main" class="ui-content">
+        <form id="from-search" onsubmit="return false;">
+            <div class="ui-field-contain">
+                <label for="search"><h2>请输入查找的内容</h2></label>
+                <input type="text" name="search" id="search">
+            </div>
+            <input type="submit" data-inline="true" id="sub" value="提交">
+        </form>
+        <ul data-role="listview" data-inset="true" id="plan-list">
+
+        </ul>
+    </div>
+    <div data-role="footer" data-position="fixed">
+        <h1>感谢使用</h1>
+    </div>
+</div>
+</body>
+<script>
+    $("#sub").click(function () {
+        //将表单数据转为字符串类型的数据
+        var params = $('#from-search').serialize();
+        $.ajax({
+            url: '/staff/search/',
+            type: 'POST',
+            data: params,
+            dataType: 'json',
+            success: function (res) {
+                var daras = res.data;
+                var tbhtml = "";
+                for (var i = 0; i < daras.length; i++) {
+                    var sfName = daras[i].sfName;
+                    var sfId = daras[i].sfId;
+                    var sfcheck = daras[i].sfCheck === "0" ? "否" : "是";
+                    var sflazy = daras[i].sfLazy;
+                    tbhtml += "<li><a href=\"/staff/" + sfId + "\" onclick=\"sendBtn(this);return false;\" ><h3>" + sfName + "</h3><p>总打卡次数：" + sflazy + "，今日是否打卡：" + sfcheck + "</p></a>" +
+                        "<a href=\"/staff/" + sfId + "\" onclick=\"deleteBtn(this);return false;\" data-icon=\"delete\"></a></li>";
+                }
+                $('ul:eq(0)').html(tbhtml);
+                $('#plan-list').listview('refresh');
+            }
+        })
+        // return false//默认阻止提交数据跳转
+    })
+
+    function sendBtn(node) {
+        var url = node.href;/*得到href的值*/
+        $.ajax({
+            url: url,/*url也可以是json之类的文件等等*/
+            type: 'GET',
+            success: function (res) {
+                //判断result结果
+                if (res.code === 1) {
+                    window.localStorage.setItem("updateID", res.data.sfId)
+                    window.location.href = 'staffUpdate.html';
+                } else {
+                    alert("访问错误")
+                }
+            }
+        })
+    }
+
+    function deleteBtn(node) {
+        var url = node.href;/*得到href的值*/
+        $.ajax({
+            url: url,/*url也可以是json之类的文件等等*/
+            type: 'DELETE',
+            success: function (result) {
+                //判断result结果
+                if (result.code === 1) {
+                    window.location.reload();
+                } else {
+                    alert("删除失败")
+                }
+            }
+        })
+    }
+</script>
+</html>

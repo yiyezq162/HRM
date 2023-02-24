@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Yuan-Programmer"/>
+    <title>后台管理</title>
+    <link href="css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <script src="../js/jQuery-3.6.1.js"></script>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <style>
+        input {
+            outline-style: none;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            padding: 14px 14px;
+            width: 400px;
+            font-size: 15px;
+        }
+
+        .radio_type {
+            width: 80px;
+        }
+
+        .input_type {
+            width: 485px;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+
+<div class="row">
+    <div class="col-sm-6">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h1>企业人事管理系统</h1>
+                <div class="ibox-content">
+                    <a href="index.html" class="btn btn-xs btn-rounded btn-primary"><h3>返回</h3></a>
+                </div>
+                <form id="update" onsubmit="return false;">
+                    <table>
+                        <tr>
+                            <th>员工号</th>
+                            <td><input type="text" name="sfId" id="sfId" readonly></td>
+                        </tr>
+                        <tr>
+                            <th>姓名</th>
+                            <td><input type="text" name="sfName" id="name"/></td>
+                        </tr>
+
+                        <tr>
+                            <th>密码</th>
+                            <td><input type="text" name="sfPassword" id="password"/></td>
+                        </tr>
+
+                        <tr>
+                            <th>年龄</th>
+                            <td><input type="text" name="sfAge" id="age"/></td>
+                        </tr>
+
+                        <tr>
+                            <th>部门</th>
+                            <td>
+                                <label for="sfDep"></label>
+                                <select name="sfDep" class="selector" id="sfDep"
+                                        style="width: 396px;font-size: 15px;height: 51px">
+                                    <option>更改部门</option>
+                                    <option value="1">销售部</option>
+                                    <option value="2">研发部</option>
+                                    <option value="3">仓库部</option>
+                                    <option value="4">财务部</option>
+                                    <option value="5">商务部</option>
+                                </select>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>入职时间</th>
+                            <td><input type="text" id="today" readonly/>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>许诺薪资</th>
+                            <td><input type="text" id="salary" name="sfSalary"/>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>是否为管理员</th>
+                            <td>
+                                <input class="radio_type" id="radio1" type="radio" name="isAdmin" value="1">是
+                                <input class="radio_type" id="radio2" type="radio" checked name="isAdmin" value="0">否
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>本月打卡次数</th>
+                            <td><input type="text" id="sfLazy" name="sfLazy"/>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>今日是否打卡</th>
+                            <td>
+                                <input class="radio_type" type="radio" id="radio3" checked name="sfCheck" value="1">是
+                                <input class="radio_type" type="radio" id="radio4" name="sfCheck" value="0">否
+                            </td>
+                        </tr>
+
+
+                        <tr>
+                            <th colspan="2"><input class="input_type" id="updateSub" type="submit" value="提交"/></th>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    var updateID = window.localStorage.getItem("updateID")
+    $(document).ready(function () {
+        $.ajax({
+            url: '/staff/' + updateID,
+            type: 'GET',
+            dataType: 'json',
+            success: function (res) {
+                if (res.code === 1) {
+                    $("#sfId").val(res.data.sfId)
+                    $("#name").val(res.data.sfName)
+                    $("#age").val(res.data.sfAge)
+                    $(".selector").val(res.data.sfDep)
+                    $("#today").val(res.data.sfOnTime)
+                    $("#password").val(res.data.sfPassword)
+                    $("#salary").val(res.data.sfSalary)
+                    if (res.data.isAdmin === "1") {
+                        console.log("1")
+                        $("#radio1").attr("checked", "checked").prop("checked", true).trigger("change")
+                    } else {
+                        console.log("2")
+                        $("#radio2").attr("checked", "checked").prop("checked", true).trigger("change")
+                    }
+                    $("#sfLazy").val(res.data.sfLazy)
+                    if (res.data.sfCheck === "1") {
+                        console.log("1")
+                        $("#radio3").attr("checked", "checked").prop("checked", true).trigger("change")
+                    } else {
+                        console.log("2")
+                        $("#radio4").attr("checked", "checked").prop("checked", true).trigger("change")
+                    }
+                } else {
+                    alert("Something")
+                }
+            }
+        })
+    })
+
+    $("#updateSub").click(function () {
+        //将表单数据转为字符串类型的数据
+        var params = $('#update').serialize();
+        $.ajax({
+            type: "PUT",
+            url: "/staff",
+            data: params,
+            // 指定参数的格式类型
+            contentType: 'application/x-www-form-urlencoded',
+            success: function (res) {
+                if (res.code === 1) {
+                    alert("修改成功！")
+                    window.location.href = 'index.html';
+                } else {
+                    alert("修改失败")
+                }
+            },
+        })
+        // return false//默认阻止提交数据跳转
+    })
+
+
+</script>
+</html>

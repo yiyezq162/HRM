@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>部门列表</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <!-- meta使用viewport以确保页面可自由缩放 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- 引入 jQuery Mobile 样式 -->
+    <link rel="stylesheet" href="http://apps.bdimg.com/libs/jquerymobile/1.4.5/jquery.mobile-1.4.5.min.css">
+
+    <!-- 引入 jQuery 库 -->
+    <script src="http://apps.bdimg.com/libs/jquery/1.10.2/jquery.min.js"></script>
+
+    <!-- 引入 jQuery Mobile 库 -->
+    <script src="http://apps.bdimg.com/libs/jquerymobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+</head>
+<body>
+<div data-role="page" id="pageone">
+    <div data-role="header">
+        <a href="workLogin.html" data-icon="back" rel="external">退出登录</a>
+        <h1>上班快乐</h1>
+        <a href="workUpdate.html" data-icon="search" rel="external">修改密码</a>
+    </div>
+    <div data-role="main" class="ui-content">
+        <table id="myTable" data-role="table" class="ui-responsive">
+            <thead>
+            <tr>
+                <th>员工号</th>
+                <th>姓名</th>
+                <th>今日是否打卡</th>
+                <th>本月打卡次数</th>
+                <th>所属部门</th>
+                <th>公司许诺工资</th>
+            </tr>
+            </thead>
+            <tbody id="myTbody">
+            <tr>
+                <td>2</td>
+                <td>李四四</td>
+                <td>是</td>
+                <td>13</td>
+                <td>1</td>
+                <td>5600</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div data-role="footer" data-position="fixed">
+        <a href="#" onclick="checkBtn();return false;" data-icon="check" rel="external">打卡</a>
+        <a href="#" onclick="sorry();return false;" data-icon="calendar" rel="external">请假</a>
+        <a href="#" onclick="sorry();return false;" data-icon="cloud" rel="external">出差</a>
+        <a href="#" onclick="sorry();return false;" data-icon="shop" rel="external">报销</a>
+    </div>
+</div>
+</body>
+<script>
+    var userID = window.localStorage.getItem("loginUserId")
+    var sfcheck = ""
+    $(document).ready(function () {
+        $.ajax({
+            url: '/staff/' + userID,
+            type: 'get',
+            dataType: 'json',
+            success: function (res) {
+                sfcheck = res.data.sfCheck === "0" ? "否" : "是";
+                var Dep = ""
+                if (res.data.sfDep === "1") {
+                    Dep = "销售部";
+                } else if (res.data.sfDep === "2") {
+                    Dep = "研发部";
+                } else if (res.data.sfDep === "3") {
+                    Dep = "仓库部";
+                } else if (res.data.sfDep === "4") {
+                    Dep = "财务部";
+                } else if (res.data.sfDep === "5") {
+                    Dep = "商务部";
+                }
+                var tbhtml = "<tr>" +
+                    "<td>" + res.data.sfId + "</td>" +
+                    "<td>" + res.data.sfName + "</td>" +
+                    "<td>" + sfcheck + "</td>" +
+                    "<td>" + res.data.sfLazy + "</td>" +
+                    "<td>" + Dep + "</td>" +
+                    "<td>" + res.data.sfSalary + "</td>" +
+                    "</tr>";
+
+                console.log(tbhtml)
+                $("#myTbody").html(tbhtml)
+                $("#myTable").table("refresh")
+            }
+        })
+    })
+
+    function checkBtn() {
+        if (sfcheck !== "是") {
+            $.ajax({
+                url: '/staff/check/' + userID,
+                type: 'get',
+                dataType: 'json',
+                success: function (res) {
+                    var days = res.data.sfLazy
+                    alert("签到成功！，这是你这个月第" + days + "次签到")
+                    window.location.reload()
+                }
+            })
+        } else {
+            alert("请不要重复签到")
+            window.location.reload()
+        }
+    }
+
+    function sorry() {
+        alert("sorry！该功能还在研发中！")
+    }
+
+</script>
+</html>

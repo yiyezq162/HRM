@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Yuan-Programmer"/>
+    <title>后台管理</title>
+    <link rel="stylesheet" href="css/style.min862f.css">
+    <script src="../js/jQuery-3.6.1.js"></script>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <style>
+        ul li {
+            float: left;
+            margin-right: 5px;
+            list-style: none;
+        }
+    </style>
+
+</head>
+<body class="gray-bg">
+
+<div class="row">
+    <div class="col-sm-6">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h1>企业人事管理系统</h1>
+                <div class="ibox-content">
+                    <ul id="depUl">
+                        <li>
+                            <a class="btn btn-xs btn-rounded btn-primary">部门</a>
+                        </li>
+                    </ul>
+                    <div class="ibox-tools">
+                        <ul>
+                            <li><a onclick="empty();return false;"
+                                   class="btn btn-xs btn-rounded btn-primary">清空今日打卡</a></li>
+                            <li><a onclick="historys();return false;"
+                                   class="btn btn-xs btn-rounded btn-primary">历史打卡记录</a>
+                            </li>
+                            <li><a onclick="today();return false;"
+                                   class="btn btn-xs btn-rounded btn-primary">今未打卡员工</a></li>
+                            <li><a href="add.html" class="btn btn-xs btn-rounded btn-primary">添加新员工</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="ibox-content">
+                <form id="from-search" onsubmit="return false;">
+                    <div class="input-group">
+                        <input type="text" placeholder="请输入关键词" name="search" class="input-sm form-control"> <span
+                            class="input-group-btn">
+                    <button onclick="searchInput()" type="button" class="btn btn-sm btn-primary">搜索</button> </span>
+                    </div>
+                </form>
+                <table class="footable table table-stripped toggle-arrow-tiny">
+                    <thead>
+                    <tr>
+                        <th>员工编号</th>
+                        <th>员工姓名</th>
+                        <th>今日打卡</th>
+                        <th>月卡次数</th>
+                    </tr>
+                    </thead>
+                    <tbody id="depList">
+                    <tr>
+                        <td>1</td>
+                        <td>黎锦斌</td>
+                        <td>1</td>
+                        <td>23</td>
+                        <td style="width: 50px;">
+                            <a class="updateUserBtn btn btn-warning btn-xs btn-rounded">修改</a>
+                        </td>
+                        <td style="width: 50px;">
+                            <a class="deleteUserBtn btn btn-danger btn-xs btn-rounded">删除</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            url: '/department',
+            type: 'get',
+            dataType: 'json',
+            success: function (res) {
+                var daras = res.data;
+                var tbhtml = "";
+                for (var i = 0; i < daras.length; i++) {
+                    var depName = daras[i].depName;
+                    var depId = daras[i].depId;
+                    tbhtml += "<li><a class=\"btn btn-xs btn-rounded btn-primary\" href=\"/staff/dep/" + depId + "\" onclick=\"sendBtn(this);return false;\" >" + depName + "</a></li>";
+
+                }
+                $('ul:eq(0)').html(tbhtml);
+                today()
+            }
+        })
+    })
+
+    function searchInput() {
+        var params = $('#from-search').serialize();
+        $.ajax({
+            url: '/staff/search/',
+            type: 'POST',
+            data: params,
+            dataType: 'json',
+            success: function (res) {
+                var daras = res.data;
+                var tbhtml = "";
+                for (var i = 0; i < daras.length; i++) {
+                    var sfName = daras[i].sfName
+                    var sfId = daras[i].sfId
+                    var sfcheck = daras[i].sfCheck === "0" ? "否" : "是";
+                    var sfLazy = daras[i].sfLazy
+                    tbhtml += "<tr>" +
+                        "<td>" + sfId + "</td>" +
+                        "<td>" + sfName + "</td>" +
+                        "<td>" + sfcheck + "</td>" +
+                        "<td>" + sfLazy + "</td>" +
+                        "<td style=\"width: 50px;\"><a href=\"/staff/" + sfId + "\" onclick=\"updateBtn(this);return false;\" class=\"updateUserBtn btn btn-warning btn-xs btn-rounded\">修改</a></td>" +
+                        "<td style=\"width: 50px;\"><a href=\"/staff/" + sfId + "\" onclick=\"deleteBtn(this);return false;\" class=\"deleteUserBtn btn btn-danger btn-xs btn-rounded\">删除</a></td>" +
+                        "</tr>"
+                }
+                $("#depList").html(tbhtml)
+            }
+        })
+    }
+
+    function sendBtn(node) {
+        var url = node.href;/*得到href的值*/
+        $.ajax({
+            url: url,/*url也可以是json之类的文件等等*/
+            type: 'Get',
+            success: function (res) {
+                var daras = res.data;
+                var tbhtml = "";
+                for (var i = 0; i < daras.length; i++) {
+                    var sfName = daras[i].sfName
+                    var sfId = daras[i].sfId
+                    var sfcheck = daras[i].sfCheck === "0" ? "否" : "是";
+                    var sfLazy = daras[i].sfLazy
+                    tbhtml += "<tr>" +
+                        "<td>" + sfId + "</td>" +
+                        "<td>" + sfName + "</td>" +
+                        "<td>" + sfcheck + "</td>" +
+                        "<td>" + sfLazy + "</td>" +
+                        "<td style=\"width: 50px;\"><a href=\"/staff/" + sfId + "\" onclick=\"updateBtn(this);return false;\" class=\"updateUserBtn btn btn-warning btn-xs btn-rounded\">修改</a></td>" +
+                        "<td style=\"width: 50px;\"><a href=\"/staff/" + sfId + "\" onclick=\"deleteBtn(this);return false;\" class=\"deleteUserBtn btn btn-danger btn-xs btn-rounded\">删除</a></td>" +
+                        "</tr>"
+                }
+                $("#depList").html(tbhtml)
+            }
+        })
+    }
+
+    function empty() {
+        $.ajax({
+            url: '/staff/emptyCheck', /*url也可以是json之类的文件等等*/
+            type: 'GET',
+            dataType: 'json',
+            success: function (res) {
+                console.log(res.code);
+                if (res.code === "1") {
+                    alert("今天打卡清空成功！");
+                } else {
+                    alert("未知错误")
+                }
+            }
+        })
+    }
+
+    function historys() {
+        //将表单数据转为字符串类型的数据
+        $.ajax({
+            url: '/staff/history',
+            type: 'get',
+            dataType: 'json',
+            success: function (res) {
+                var daras = res.data;
+                var tbhtml = "";
+                for (var i = 0; i < daras.length; i++) {
+                    var sfName = daras[i].sfName
+                    var sfId = daras[i].sfId
+                    var sfcheck = daras[i].sfCheck === "0" ? "否" : "是";
+                    var sfLazy = daras[i].sfLazy
+                    tbhtml += "<tr>" +
+                        "<td>" + sfId + "</td>" +
+                        "<td>" + sfName + "</td>" +
+                        "<td>" + sfcheck + "</td>" +
+                        "<td>" + sfLazy + "</td>" +
+                        "<td style=\"width: 50px;\"><a href=\"/staff/" + sfId + "\" onclick=\"updateBtn(this);return false;\" class=\"updateUserBtn btn btn-warning btn-xs btn-rounded\">修改</a></td>" +
+                        "<td style=\"width: 50px;\"><a href=\"/staff/" + sfId + "\" onclick=\"deleteBtn(this);return false;\" class=\"deleteUserBtn btn btn-danger btn-xs btn-rounded\">删除</a></td>" +
+                        "</tr>"
+                }
+                $("#depList").html(tbhtml)
+            }
+        })
+    }
+
+    function today() {
+        $.ajax({
+            url: '/staff/today',
+            type: 'get',
+            dataType: 'json',
+            success: function (res) {
+                var daras = res.data;
+                var tbhtml = "";
+                for (var i = 0; i < daras.length; i++) {
+                    var sfName = daras[i].sfName
+                    var sfId = daras[i].sfId
+                    var sfcheck = daras[i].sfCheck === "0" ? "否" : "是";
+                    var sfLazy = daras[i].sfLazy
+                    tbhtml += "<tr>" +
+                        "<td>" + sfId + "</td>" +
+                        "<td>" + sfName + "</td>" +
+                        "<td>" + sfcheck + "</td>" +
+                        "<td>" + sfLazy + "</td>" +
+                        "<td style=\"width: 50px;\"><a href=\"/staff/" + sfId + "\" onclick=\"updateBtn(this);return false;\" class=\"updateUserBtn btn btn-warning btn-xs btn-rounded\">修改</a></td>" +
+                        "<td style=\"width: 50px;\"><a href=\"/staff/" + sfId + "\" onclick=\"deleteBtn(this);return false;\" class=\"deleteUserBtn btn btn-danger btn-xs btn-rounded\">删除</a></td>" +
+                        "</tr>"
+                }
+                $("#depList").html(tbhtml)
+            }
+        })
+    }
+
+    function updateBtn(node) {
+        var url = node.href;/*得到href的值*/
+        $.ajax({
+            url: url,/*url也可以是json之类的文件等等*/
+            type: 'GET',
+            success: function (res) {
+                //判断result结果
+                if (res.code === 1) {
+                    window.localStorage.setItem("updateID", res.data.sfId)
+                    window.location.href = 'update.html';
+                } else {
+                    alert("访问错误")
+                }
+            }
+        })
+    }
+
+    function deleteBtn(node) {
+        var url = node.href;/*得到href的值*/
+        $.ajax({
+            url: url,/*url也可以是json之类的文件等等*/
+            type: 'DELETE',
+            success: function (result) {
+                //判断result结果
+                if (result.code === 1) {
+                    alert("删除成功！")
+                    window.location.reload();
+                } else {
+                    alert("删除失败")
+                }
+            }
+        })
+    }
+
+</script>
+</html>

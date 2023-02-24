@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <!-- meta使用viewport以确保页面可自由缩放 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 引入 jQuery Mobile 样式 -->
+    <link rel="stylesheet" href="http://apps.bdimg.com/libs/jquerymobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <!-- 引入 jQuery 库 -->
+    <script src="http://apps.bdimg.com/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!-- 引入 jQuery Mobile 库 -->
+    <script src="http://apps.bdimg.com/libs/jquerymobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+</head>
+<body>
+
+<div data-role="page">
+    <div data-role="header">
+        <h1>登录</h1>
+    </div>
+    <div data-role="main" class="ui-content">
+        <p>企业人事管理系统</p>
+        <form id="form" onsubmit="return false;">
+            <label for="name">用户ID：</label>
+            <input type="text" name="username" id="name">
+            <label for="password">密码：</label>
+            <input type="password" name="password" id="password">
+            <input type="submit" data-inline="true" id="login" value="提交">
+        </form>
+    </div>
+    <div data-role="footer" data-position="fixed">
+        <h1>欢迎使用</h1>
+    </div>
+</div>
+</body>
+<script>
+    $("#login").click(function () {
+        //将表单数据转为字符串类型的数据
+        var params = $('#form').serialize();
+        $.ajax({
+            type: "POST",
+            url: "/login",
+            data: params,
+            // 指定参数的格式类型
+            contentType: 'application/x-www-form-urlencoded',
+            success: function (res) {
+                if (res.code === 1) {
+                    window.location.href = 'department.html';
+                } else {
+                    alert(res.msg)
+                }
+            },
+        })
+        // return false//默认阻止提交数据跳转
+    })
+
+</script>
+</html>

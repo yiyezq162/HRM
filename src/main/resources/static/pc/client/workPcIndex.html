@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Yuan-Programmer"/>
+    <title>后台管理</title>
+
+    <style>
+        ul li {
+            float: left;
+            margin-right: 5px;
+            list-style: none;
+        }
+    </style>
+
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <script src="../../js/jQuery-3.6.1.js"></script>
+    <link rel="stylesheet" href="../css/style.min862f.css">
+
+</head>
+<body class="gray-bg">
+
+<div class="row">
+    <div class="col-sm-6">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h1>企业人事管理系统(打卡端)</h1>
+                <div class="ibox-content">
+                    <a href="workPcLogin.html" class="btn btn-xs btn-rounded btn-primary"><h3>退出登录</h3></a>
+                    <div class="ibox-tools">
+                        <ul>
+                            <li><a onclick="checkBtn();return false;"
+                                   class="btn btn-xs btn-rounded btn-primary">上班打卡</a></li>
+
+                            <li><a onclick="sorry();return false;"
+                                   class="btn btn-xs btn-rounded btn-primary">申请请假</a></li>
+
+                            <li><a onclick="sorry();return false;"
+                                   class="btn btn-xs btn-rounded btn-primary">主动加班</a></li>
+
+                            <li><a onclick="sorry();return false;"
+                                   class="btn btn-xs btn-rounded btn-primary">出差事宜</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="ibox-content">
+                <form id="from-search" onsubmit="return false;">
+
+                </form>
+                <table id="myTable" class="footable table table-stripped toggle-arrow-tiny">
+                    <thead>
+                    <tr>
+                        <th>员工编号</th>
+                        <th>员工姓名</th>
+                        <th>今日打卡</th>
+                        <th>月卡次数</th>
+                        <th>员工部门</th>
+                        <th>许诺工资</th>
+                    </tr>
+                    </thead>
+                    <tbody id="myTbody">
+                    <tr>
+                        <td>1</td>
+                        <td>黎锦斌</td>
+                        <td>1</td>
+                        <td>23</td>
+                        <td>销售部</td>
+                        <td>23000</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    var userID = window.localStorage.getItem("loginPcUserId")
+    var sfcheck = ""
+    $(document).ready(function () {
+        $.ajax({
+            url: '/staff/' + userID,
+            type: 'get',
+            dataType: 'json',
+            success: function (res) {
+                sfcheck = res.data.sfCheck === "0" ? "否" : "是";
+                var Dep = ""
+                if (res.data.sfDep === "1") {
+                    Dep = "销售部";
+                } else if (res.data.sfDep === "2") {
+                    Dep = "研发部";
+                } else if (res.data.sfDep === "3") {
+                    Dep = "仓库部";
+                } else if (res.data.sfDep === "4") {
+                    Dep = "财务部";
+                } else if (res.data.sfDep === "5") {
+                    Dep = "商务部";
+                }
+                var tbhtml = "<tr>" +
+                    "<td>" + res.data.sfId + "</td>" +
+                    "<td>" + res.data.sfName + "</td>" +
+                    "<td>" + sfcheck + "</td>" +
+                    "<td>" + res.data.sfLazy + "</td>" +
+                    "<td>" + Dep + "</td>" +
+                    "<td>" + res.data.sfSalary + "</td>" +
+                    "<td style=\"width: 50px;\"><a href=\"/staff/" + res.data.sfId + "\" onclick=\"updateBtn(this);return false;\" class=\"deleteUserBtn btn btn-danger btn-xs btn-rounded\">修改密码</a></td>" +
+                    "</tr>";
+
+                console.log(tbhtml)
+                $("#myTbody").html(tbhtml)
+            }
+        })
+    })
+
+    function updateBtn(node) {
+        var url = node.href;/*得到href的值*/
+        $.ajax({
+            url: url,/*url也可以是json之类的文件等等*/
+            type: 'GET',
+            success: function (res) {
+                //判断result结果
+                if (res.code === 1) {
+                    window.location.href = 'workPcUpdate.html';
+                } else {
+                    alert("访问错误")
+                }
+            }
+        })
+    }
+
+    function sorry() {
+        alert("sorry！该功能还在研发中！")
+    }
+
+    function checkBtn() {
+        if (sfcheck !== "是") {
+            $.ajax({
+                url: '/staff/check/' + userID,
+                type: 'get',
+                dataType: 'json',
+                success: function (res) {
+                    alert("签到成功！，这是你这个月第" + res.data.sfLazy + "次签到")
+                    window.location.reload()
+                }
+            })
+        } else {
+            alert("请不要重复签到")
+            window.location.reload()
+        }
+    }
+
+</script>
+</html>

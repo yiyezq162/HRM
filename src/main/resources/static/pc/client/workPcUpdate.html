@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Yuan-Programmer"/>
+    <title>后台管理</title>
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <script src="../../js/jQuery-3.6.1.js"></script>
+    <link rel="stylesheet" href="../css/style.min862f.css">
+    <style>
+        input {
+            outline-style: none;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            padding: 14px 14px;
+            width: 400px;
+            font-size: 15px;
+        }
+
+        .input_type {
+            width: 485px;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+
+<div class="row">
+    <div class="col-sm-6">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h1>企业人事管理系统</h1>
+                <div class="ibox-content">
+                    <a href="workPcIndex.html" class="btn btn-xs btn-rounded btn-primary"><h3>返回</h3></a>
+                </div>
+                <form id="update" onsubmit="return false;">
+                    <table>
+                        <tr>
+                            <th>员工号</th>
+                            <td><input type="text" name="sfId" id="sfId" readonly></td>
+                        </tr>
+
+                        <tr>
+                            <th>密码</th>
+                            <td><input type="text" name="sfPassword" id="password"/></td>
+                        </tr>
+
+                        <tr>
+                            <td><input type="hidden" id="salary" name="sfSalary"/>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th colspan="2"><input class="input_type" id="updateSub" type="submit" value="提交"/></th>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    var updateID = window.localStorage.getItem("loginPcUserId")
+    $(document).ready(function () {
+        $.ajax({
+            url: '/staff/' + updateID,
+            type: 'GET',
+            dataType: 'json',
+            success: function (res) {
+                if (res.code === 1) {
+                    $("#sfId").val(res.data.sfId)
+                    $("#password").val(res.data.sfPassword)
+                    $("#salary").val(res.data.sfSalary)
+                } else {
+                    alert("Something")
+                }
+            }
+        })
+    })
+
+    $("#updateSub").click(function () {
+        //将表单数据转为字符串类型的数据
+        var params = $('#update').serialize();
+        $.ajax({
+            type: "PUT",
+            url: "/staff",
+            data: params,
+            // 指定参数的格式类型
+            contentType: 'application/x-www-form-urlencoded',
+            success: function (res) {
+                if (res.code === 1) {
+                    alert("修改成功！")
+                    window.location.href = 'workPcIndex.html';
+                } else {
+                    alert("修改失败")
+                }
+            },
+        })
+        // return false//默认阻止提交数据跳转
+    })
+
+
+</script>
+</html>

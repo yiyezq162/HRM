@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Yuan-Programmer"/>
+    <title>后台管理</title>
+    <link href="css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <script src="../js/jQuery-3.6.1.js"></script>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <style>
+        input {
+            outline-style: none;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            padding: 14px 14px;
+            width: 400px;
+            font-size: 15px;
+        }
+
+        .radio_type {
+            width: 80px;
+        }
+
+        .input_type {
+            width: 485px;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+
+<div class="row">
+    <div class="col-sm-6">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h1>企业人事管理系统</h1>
+                <div class="ibox-content">
+                    <a href="index.html" class="btn btn-xs btn-rounded btn-primary"><h3>返回</h3></a>
+                </div>
+            <form id="add" onsubmit="return false;">
+                <table>
+                    <tr>
+                        <th>姓名</th>
+                        <td><input type="text" name="sfName"/></td>
+                    </tr>
+
+                    <tr>
+                        <th>密码</th>
+                        <td><input type="text" name="sfPassword"/></td>
+                    </tr>
+
+                    <tr>
+                        <th>年龄</th>
+                        <td><input type="text" name="sfAge"/></td>
+                    </tr>
+
+                    <tr>
+                        <th>部门</th>
+                        <td>
+                            <label for="sfDep"></label><select name="sfDep" id="sfDep"
+                                                               style="width: 400px;font-size: 15px;height: 51px">
+                            <option value="1">销售部</option>
+                            <option value="2">研发部</option>
+                            <option value="3">仓库部</option>
+                            <option value="4">财务部</option>
+                            <option value="5">商务部</option>
+                        </select>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>入职时间</th>
+                        <td><input type="text" id="today" readonly/>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>许诺薪资</th>
+                        <td><input type="text" name="sfSalary"/>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>是否为管理员</th>
+                        <td>
+                            <input class="radio_type" id="radio1" type="radio" name="isAdmin" value="1">是
+                            <input class="radio_type" id="radio2" type="radio" checked name="isAdmin" value="0">否
+                        </td>
+                    </tr>
+                    <input type="hidden" id="sfLazy" name="sfLazy" value="0"/>
+                    <input type="hidden" id="sfCheck" name="sfCheck" value="0"/>
+                    <tr>
+                        <th colspan="2"><input class="input_type" type="submit" id="up" value="提交"/></th>
+                    </tr>
+                </table>
+            </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+
+    function today() {
+        var today = new Date();
+        var h = today.getFullYear();
+        var m = today.getMonth() + 1;
+        var d = today.getDate();
+        var H = today.getHours();
+        var M = today.getMinutes();
+        var S = today.getSeconds();
+        return h + "-" + m + "-" + d + " " + H + ":" + M + ":" + S; //返回 年-月-日 时:分:秒
+    }
+
+    document.getElementById("today").value = today();
+
+    $("#up").click(function () {
+        //将表单数据转为字符串类型的数据
+        var params = $('#add').serialize();
+        $.ajax({
+            type: "POST",
+            url: "/staff",
+            data: params,
+            // 指定参数的格式类型
+            contentType: 'application/x-www-form-urlencoded',
+            success: function (res) {
+                if (res.code === 1) {
+                    alert("添加成功！")
+                    window.location.href = 'index.html';
+                } else {
+                    alert("添加失败")
+                }
+            },
+        })
+        // return false//默认阻止提交数据跳转
+    })
+
+</script>
+</html>

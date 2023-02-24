@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>员工列表</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <!-- meta使用viewport以确保页面可自由缩放 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- 引入 jQuery Mobile 样式 -->
+    <link rel="stylesheet" href="http://apps.bdimg.com/libs/jquerymobile/1.4.5/jquery.mobile-1.4.5.min.css">
+
+    <!-- 引入 jQuery 库 -->
+    <script src="http://apps.bdimg.com/libs/jquery/1.10.2/jquery.min.js"></script>
+
+    <!-- 引入 jQuery Mobile 库 -->
+    <script src="http://apps.bdimg.com/libs/jquerymobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+</head>
+<body>
+<div data-role="page" id="pageone">
+    <div data-role="header">
+        <a href="#" onclick="javascript:history.go(-1);" data-icon="back" rel="external">返回</a>
+        <h1>修改员工</h1>
+    </div>
+    <div data-role="main" class="ui-content">
+        <form id="form" onsubmit="return false;">
+            <table>
+                <tr>
+                    <th>员工号</th>
+                    <td><input type="text" name="sfId" id="sfId" readonly></td>
+                </tr>
+                <tr>
+                    <th>姓名</th>
+                    <td><input type="text" name="sfName" id="name"/></td>
+                </tr>
+
+                <tr>
+                    <th>密码</th>
+                    <td><input type="text" name="sfPassword" id="password"/></td>
+                </tr>
+
+                <tr>
+                    <th>年龄</th>
+                    <td><input type="text" name="sfAge" id="age"/></td>
+                </tr>
+
+                <tr>
+                    <th>部门</th>
+                    <td>
+                        <label>
+                            <select name="sfDep" class="selector">
+                                <option>更改部门</option>
+                                <option value="1">销售部</option>
+                                <option value="2">研发部</option>
+                                <option value="3">仓库部</option>
+                                <option value="4">财务部</option>
+                                <option value="5">商务部</option>
+                            </select>
+                        </label>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>入职时间</th>
+                    <td><input type="text" id="today" readonly/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>许诺薪资</th>
+                    <td><input type="text" id="salary" name="sfSalary"/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>是否为管理员</th>
+                    <td>
+                        <label>
+                            <input type="radio" id="radio1" name="isAdmin" value="1">是
+                        </label>
+                        <label>
+                            <input type="radio" id="radio2" checked name="isAdmin" value="0">否
+                        </label>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>本月打卡次数</th>
+                    <td><input type="text" id="sfLazy" name="sfLazy"/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>今日是否打卡</th>
+
+                    <td>
+                        <label>
+                            <input type="radio" id="radio3" checked name="sfCheck" value="1">是
+                        </label>
+                        <label>
+                            <input type="radio" id="radio4" name="sfCheck" value="0">否
+                        </label>
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <th colspan="2"><input id="update" type="submit" value="提交"/></th>
+                </tr>
+            </table>
+        </form>
+    </div>
+    <div data-role="footer" data-position="fixed">
+        <h1>感谢使用</h1>
+    </div>
+</div>
+</body>
+<script>
+    var updateID = window.localStorage.getItem("updateID")
+    $(document).ready(function () {
+        $.ajax({
+            url: '/staff/' + updateID,
+            type: 'GET',
+            dataType: 'json',
+            success: function (res) {
+                if (res.code === 1) {
+                    $("#sfId").val(res.data.sfId)
+                    $("#name").val(res.data.sfName)
+                    $("#age").val(res.data.sfAge)
+                    $(".selector").val(res.data.sfDep)
+                    $("#today").val(res.data.sfOnTime)
+                    $("#password").val(res.data.sfPassword)
+                    $("#salary").val(res.data.sfSalary)
+                    if (res.data.isAdmin === "1") {
+                        console.log("1")
+                        $("#radio1").attr("checked", "checked").prop("checked", true).trigger("change")
+                    } else {
+                        console.log("2")
+                        $("#radio2").attr("checked", "checked").prop("checked", true).trigger("change")
+                    }
+                    $("#sfLazy").val(res.data.sfLazy)
+                    $("#sfCheck").val(res.data.sfCheck)
+                } else {
+                    alert("Something")
+                }
+            }
+        })
+    })
+
+    $("#update").click(function () {
+        //将表单数据转为字符串类型的数据
+        var params = $('#form').serialize();
+        $.ajax({
+            type: "PUT",
+            url: "/staff",
+            data: params,
+            // 指定参数的格式类型
+            contentType: 'application/x-www-form-urlencoded',
+            success: function (res) {
+                if (res.code === 1) {
+                    alert("修改成功！")
+                    window.location.href = 'staffList.html';
+                } else {
+                    alert("修改失败")
+                }
+            },
+        })
+        // return false//默认阻止提交数据跳转
+    })
+
+</script>
+</html>

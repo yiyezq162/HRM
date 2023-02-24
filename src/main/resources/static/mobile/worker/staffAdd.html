@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>新增员工</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <!-- meta使用viewport以确保页面可自由缩放 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- 引入 jQuery Mobile 样式 -->
+    <link rel="stylesheet" href="http://apps.bdimg.com/libs/jquerymobile/1.4.5/jquery.mobile-1.4.5.min.css">
+
+    <!-- 引入 jQuery 库 -->
+    <script src="http://apps.bdimg.com/libs/jquery/1.10.2/jquery.min.js"></script>
+
+    <!-- 引入 jQuery Mobile 库 -->
+    <script src="http://apps.bdimg.com/libs/jquerymobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+</head>
+<body>
+<div data-role="page" id="pageone">
+    <div data-role="header">
+        <a href="#" onclick="javascript:history.go(-1);" data-icon="back">返回</a>
+        <h1>添加员工</h1>
+    </div>
+    <div data-role="main" class="ui-content">
+        <form id="add">
+            <table>
+                <tr>
+                    <th>姓名</th>
+                    <td><input type="text" name="sfName"/></td>
+                </tr>
+
+                <tr>
+                    <th>密码</th>
+                    <td><input type="text" name="sfPassword"/></td>
+                </tr>
+
+                <tr>
+                    <th>年龄</th>
+                    <td><input type="text" name="sfAge"/></td>
+                </tr>
+
+                <tr>
+                    <th>部门</th>
+                    <td>
+                        <label for="sfDep"></label><select name="sfDep" id="sfDep">
+                        <option value="1">销售部</option>
+                        <option value="2">研发部</option>
+                        <option value="3">仓库部</option>
+                        <option value="4">财务部</option>
+                        <option value="5">商务部</option>
+                    </select>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>入职时间</th>
+                    <td><input type="text" id="today" readonly/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>许诺薪资</th>
+                    <td><input type="text" name="sfSalary"/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>是否为管理员</th>
+                    <td>
+                        <label>
+                            <input id="radio1" type="radio" name="isAdmin" value="1">是
+                        </label>
+                        <label>
+                            <input id="radio2" type="radio" checked name="isAdmin" value="0">否
+                        </label>
+                    </td>
+                </tr>
+                <input type="hidden" id="sfLazy" name="sfLazy" value="0"/>
+                <input type="hidden" id="sfCheck" name="sfCheck" value="0"/>
+                <tr>
+                    <th colspan="2"><input type="submit" id="up" value="提交"/></th>
+                </tr>
+            </table>
+        </form>
+    </div>
+    <div data-role="footer" data-position="fixed">
+        <h1>感谢使用</h1>
+    </div>
+</div>
+</body>
+<script>
+
+    function today() {
+        var today = new Date();
+        var h = today.getFullYear();
+        var m = today.getMonth() + 1;
+        var d = today.getDate();
+        var H = today.getHours();
+        var M = today.getMinutes();
+        var S = today.getSeconds();
+        return h + "-" + m + "-" + d + " " + H + ":" + M + ":" + S; //返回 年-月-日 时:分:秒
+    }
+
+    document.getElementById("today").value = today();
+
+    $("#up").click(function () {
+        //将表单数据转为字符串类型的数据
+        var params = $('#add').serialize();
+        $.ajax({
+            type: "POST",
+            url: "/staff",
+            data: params,
+            // 指定参数的格式类型
+            contentType: 'application/x-www-form-urlencoded',
+            success: function (res) {
+                if (res.code === 1) {
+                    alert("添加成功！")
+                    window.location.href = 'staffList.html';
+                } else {
+                    alert("添加失败")
+                }
+            },
+        })
+        // return false//默认阻止提交数据跳转
+    })
+
+</script>
+</html>
