@@ -18,7 +18,7 @@
 
 2.前端主要是jQ和css、html来实现。后端主要是springBoot框架。
 
-3.数据库文件在项目同级目录（需修改spring配置文件），启动项目后可以在localhost:8080进行访问，或者通过在线演示链接访问。
+3.数据库文件在src/main/resources/sql（需修改spring配置文件），启动项目后可以在localhost:8080进行访问，或者通过在线演示链接访问。
 
 4.包含两个端的页面，都在src/main/resources/static目录下。主要是两个文件夹，pc端和mobile端。
 两个端里都有对应的功能页面。其中client是打卡端。其他为管理端。
